@@ -102,3 +102,11 @@ def get_par(date_data, lon, lat):
     sza = 90 - sza
     Ro = So * (1 + 0.033 * math.cos(360 * N / 365))*math.cos(sza/180*np.pi)
     return Ro
+
+def get_rmse_rrmse(targets,predictions):
+    """
+    计算均方根误差,相对均方根误差
+    """
+    rmse=np.sqrt(((predictions-targets)**2).mean())
+    rrmse=rmse/np.nanmean(targets)
+    return rmse,rrmse
