@@ -4,6 +4,7 @@
 #@Author: zhaohui li
 #@File  : Code_spain_dataproce.py
 
+import os 
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -14,16 +15,26 @@ import math
 savepath=r"D:\Thesis2\data_processed\avignon"
 filepath=r"D:\Thesis2\data\Avignon\Database db1\1 - SIF-EC"
 # # -------------------------------------------------
+# # 把所有冠层辐射参数提取出来
+# filecanopyra=r'D:\Thesis2\data\Avignon\Database db1\2 - Canopy radiances\all days'
+# files=os.listdir(filecanopyra)
+# SRAD=pd.read_table(filecanopyra+'/'+files[0])
+# for file in files[1:]:
+#     srad=pd.read_table(filecanopyra+'/'+file)
+#     srad=srad.iloc[:,1:]
+#     SRAD=pd.concat([SRAD,srad],axis=1)
+# # 
 # data=pd.read_table(filepath+"//AV2010db1.txt",encoding='utf-8')
+# print(data.shape)
 # # 补全时间
-# hour=np.arange(8,16,0.5)/24
+# hour=np.arange(7.5,16.5,0.5)/24
 # datestart=int(data.loc[0]['DOY'])
 # dateend=int(data.loc[data.shape[0]-1]['DOY'])
 # day=range(datestart,dateend+1)
 # newdoy=np.ones((dateend-datestart+1)*len(hour))
 # for i in range(0,len(newdoy),len(hour)):
 #     newdoy[i:i+len(hour)]=day[int(i/len(hour))]+hour
-
+# # SIF&GPP补全时间
 # temp=pd.DataFrame(newdoy,columns=['newdoy'])
 # new=pd.DataFrame(np.empty((temp.shape[0],data.shape[1])),columns=data.columns)
 # new['DOY']=temp
@@ -38,9 +49,22 @@ filepath=r"D:\Thesis2\data\Avignon\Database db1\1 - SIF-EC"
 #         new.iloc[i,1:]=np.nan
 #     if count>data.shape[0]-1:
 #         break
-# #
-# data=new
-# print(data.shape)
+# # canopy Ra and ref 补全时间
+# new1=pd.DataFrame(np.empty((temp.shape[0],SRAD.shape[1])),columns=SRAD.columns)
+# new1['DOY']=temp
+# count=0
+# for i in range(temp.shape[0]):
+#     if (abs(new1.loc[i]['DOY']-SRAD.loc[count]['doy']))<1e-5:
+#         print(i,count)
+#         new1.iloc[i,1:]=SRAD.iloc[count,1:]
+#         count=count+1
+#     else:
+#         new1.iloc[i,1:]=np.nan
+#     if count>SRAD.shape[0]-1:
+#         print(count)
+#         break
+# # 去掉new1中最后的DOY列
+# data=pd.concat([new,new1.iloc[:,1:-1]],axis=1)
 # # 剔除SIF<0的值
 # idx=data['SIF687']<0
 # idx1=data['SIF687']>3
@@ -69,11 +93,11 @@ filepath=r"D:\Thesis2\data\Avignon\Database db1\1 - SIF-EC"
 # data.replace(0,np.nan,inplace=True)
 # data['clear_index']=data['PAR2diff']/data['PAR2']
 # # 保存剔除的结果
-# data.to_csv(savepath+"/"+"AV2010db1_sifclean_8-18.csv",
+# data.to_csv(savepath+"/"+"AV2010db1_sifclean_8-18_ref.csv",
 #     header=True,index=False)
 
 # # # # 求日平均
-# data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_8-18.csv",encoding='utf-8')
+# data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_8-18_ref.csv",encoding='utf-8')
 # DOYnew=data['DOY']
 # all1=[]
 # daymean=[]
@@ -93,57 +117,57 @@ filepath=r"D:\Thesis2\data\Avignon\Database db1\1 - SIF-EC"
 
 # daymean=pd.DataFrame(daymean,columns=data.columns)
 # daymean['DOYnew']=[int(x) for x in daymean['DOY']]
-# daymean.to_csv(savepath+"\\"+"AV2010db1_sifclean_daymean_8-18.csv",
+# daymean.to_csv(savepath+"\\"+"AV2010db1_sifclean_daymean_8-18_ref.csv",
 #     header=True,index=False)
 # print('writing ok')
 
-## ================extract clear days data==========================
-# load data
-data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_8-18.csv",encoding='utf-8')
-data1=data.copy()
-idx=data['clear_index']<=0.5
-data.loc[idx,1:]=np.nan
-data.to_csv(savepath+"\\"+"AV2010db1_sifclean_8-18_sunny.csv",
-    header=True,index=False)
-idx=~idx
-data1.loc[idx,1:]=np.nan
-data1.to_csv(savepath+"\\"+"AV2010db1_sifclean_8-18_cloudy.csv",
-    header=True,index=False)
-data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_daymean_8-18.csv",encoding='utf-8')
-data1=data.copy()
-idx=data['clear_index']<=0.5
-data.loc[idx,1:]=np.nan
-data.to_csv(savepath+"\\"+"AV2010db1_sifclean_daymean_8-18_sunny.csv",
-    header=True,index=False)
-idx=~idx
-data1.loc[idx,1:]=np.nan
-data1.to_csv(savepath+"\\"+"AV2010db1_sifclean_daymean_8-18_cloudy.csv",
-    header=True,index=False)
+# ## ================extract clear days data==========================
+# # load data
+# data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_8-18_ref.csv",encoding='utf-8')
+# data1=data.copy()
+# idx=data['clear_index']<=0.5
+# data.loc[idx,1:]=np.nan
+# data.to_csv(savepath+"\\"+"AV2010db1_sifclean_8-18_sunny_ref.csv",
+#     header=True,index=False)
+# idx=~idx
+# data1.loc[idx,1:]=np.nan
+# data1.to_csv(savepath+"\\"+"AV2010db1_sifclean_8-18_cloudy_ref.csv",
+#     header=True,index=False)
+# data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_daymean_8-18_ref.csv",encoding='utf-8')
+# data1=data.copy()
+# idx=data['clear_index']<=0.5
+# data.loc[idx,1:]=np.nan
+# data.to_csv(savepath+"\\"+"AV2010db1_sifclean_daymean_8-18_sunny_ref.csv",
+#     header=True,index=False)
+# idx=~idx
+# data1.loc[idx,1:]=np.nan
+# data1.to_csv(savepath+"\\"+"AV2010db1_sifclean_daymean_8-18_cloudy_ref.csv",
+#     header=True,index=False)
 
 ## --------------SIF，GPP和PAR的日变化----------------
-data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_8-18_sunny.csv",encoding='utf-8')
+data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_8-18_sunny_ref.csv",encoding='utf-8')
 print(data.shape)
 # temp1=np.zeros((10,109,130))
 temp=[]
 daymean=[]
 # count=1
-for i in range(0,data.shape[0],16):
+for i in range(0,data.shape[0],18):
     # print(i)
     # temp1[:,:,count-1]=data.loc[i:i+9,:].values #和下面的效果一致
     # count=count+1
-    temp.append(data.loc[i:i+15,:].values)
+    temp.append(data.loc[i:i+17,:].values)
 daymean=np.nanmean(temp,axis=0)
 # daymean1=np.nanmean(temp1,axis=2)
 daymean=pd.DataFrame(daymean,columns=data.columns)
-daymean.to_csv(savepath+"\\"+"AV2010db1_sifclean_8-18_onesunnyday.csv",
+daymean.to_csv(savepath+"\\"+"AV2010db1_sifclean_8-18_onesunnyday_ref.csv",
     header=True,index=False)
 
-data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_8-18_cloudy.csv",encoding='utf-8')
+data=pd.read_csv(savepath+"/"+"AV2010db1_sifclean_8-18_cloudy_ref.csv",encoding='utf-8')
 temp=[]
 daymean=[]
-for i in range(0,data.shape[0],16):
-    temp.append(data.loc[i:i+15,:].values)
+for i in range(0,data.shape[0],18):
+    temp.append(data.loc[i:i+17,:].values)
 daymean=np.nanmean(temp,axis=0)
 daymean=pd.DataFrame(daymean,columns=data.columns)
-daymean.to_csv(savepath+"\\"+"AV2010db1_sifclean_8-18_onecloudyday.csv",
+daymean.to_csv(savepath+"\\"+"AV2010db1_sifclean_8-18_onecloudyday_ref.csv",
     header=True,index=False)
