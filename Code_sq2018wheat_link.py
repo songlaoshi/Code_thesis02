@@ -31,19 +31,25 @@ savepath = r'D:\Data2018\SIF_Tower'
 # dataref=dataref.parse(0)
 # wl=dataref.columns[1:].values
 # ref=dataref.iloc[:,1:]
+# #
+# datara=pd.ExcelFile(r'D:\Data2018\SIF_Tower\halfhour_9_16_radiance.xlsx')
+# datara=datara.parse(0)
+# radiance=datara.iloc[:,1:]
+# # 
 # doy=dataref['DOY']
 # hour=(doy%1)*24
-# setup=VIs_calculation_func.get_vegetation_indices(wl,ref)
+# setup=VIs_calculation_func.get_vegetation_indices(wl,ref,radiance)
 # columns=['doy','hour','NDVI','EVI','MTCI','MTVI2'
 #     ,'PRI','greenNDVI','rededgeNDVI','CIgreen','CVI','SR','ref_blue',
-#     'ref_green','ref_red','ref_nir','ref_rededge']
+#     'ref_green','ref_red','ref_nir','ref_rededge','radiance_blue',
+#     'radiance_green','radiance_red','radiance_nir','radiance_rededge']
 
 # savedata=pd.DataFrame((np.vstack([doy,hour,setup.NDVI,setup.EVI,
-#     	setup.MTCI,setup.MTVI2,setup.PRI,setup.greenNDVI,setup.rededgeNDVI,
+#       setup.MTCI,setup.MTVI2,setup.PRI,setup.greenNDVI,setup.rededgeNDVI,
 #         setup.CIgreen,setup.CVI,setup.SR,setup.Rblue,setup.Rgreen,setup.Rred,
-#         setup.Rnir,setup.Rrededge]).T),columns=columns)
+#         setup.Rnir,setup.Rrededge,setup.Ra_blue,setup.Ra_green,setup.Ra_red,
+#         setup.Ra_nir,setup.Ra_rededge]).T),columns=columns)
 # savedata.to_csv(savepath+'/VI_ref_addMTVI2_halfhourlymean.csv',index=False,header=True)
-
 # ## get SIF
 # filepath=r'D:\Data2018\SIF_Tower\SIF day'
 # filesifs=os.listdir(filepath)
@@ -72,20 +78,20 @@ savepath = r'D:\Data2018\SIF_Tower'
 
 # # link sif&vi&radiance
 datasif = pd.read_csv(savepath + '/SIF_halfhourmean.csv')
-datavi = pd.read_csv(savepath + '/VI_ref_addMTVI2_halfhourlymean.csv')
+datavi = pd.read_csv(savepath + '/VI_ref_addMTVI2_halfhourlymean_addradiance.csv')
 # 把所有冠层辐射参数提取出来
 filecanopyra = r'D:\Thesis2\data_processed\Database REF\WalRefhalfhour_9-19_sq2018wheat'
 files = os.listdir(filecanopyra)
 SRAD = pd.read_table(filecanopyra + '/' + files[0])
 # print(SRAD.columns)
-namedict = {'Rad-Down': files[0][:-4] + '_' + 'Rad-Down', 'Rad-Up': files[0][
+namedict = {'Rad-Down': files[0][:-4] + '_' + 'Rad-Down', 'Rad-up': files[0][
     :-4] + '_' + 'Rad-Up', 'Reflectance': files[0][:-4] + '_' + 'Reflectance'}
 SRAD.rename(columns=namedict, inplace=True)
 # print(SRAD.columns)
 for file in files[1:]:
     srad=pd.read_table(filecanopyra+'/'+file)
     srad=srad.iloc[:,1:]
-    namedict = {'Rad-Down': file[:-4] + '_' + 'Rad-Down', 'Rad-Up': file[
+    namedict = {'Rad-Down': file[:-4] + '_' + 'Rad-Down', 'Rad-up': file[
     :-4] + '_' + 'Rad-Up', 'Reflectance': file[:-4] + '_' + 'Reflectance'}
     srad.rename(columns=namedict,inplace=True)
     SRAD=pd.concat([SRAD,srad],axis=1)
@@ -119,5 +125,5 @@ for i in range(dataall.shape[0]):  # dataall.shape[0]
 
 Tdata = pd.DataFrame(Tdata, columns=np.hstack([dataall.columns,dataflux.columns[3:]]))
 # print(Tdata.shape)
-Tdata.to_csv(savepath + '/SIF_GPP_VI_ref_halfhourmean_sq2018wheat.csv',
+Tdata.to_csv(savepath + '/SIF_GPP_VI_ref_halfhourmean_sq2018wheat_addradiance.csv',
              index=False, header=True)

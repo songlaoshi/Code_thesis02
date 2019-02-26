@@ -203,58 +203,63 @@ def get_matlab2py_doy(mattime):
     return doy
 
 ## ---------2017-------------
-dataref=pd.ExcelFile(r'D:\Data\jurong\jur\Results\halfhour_9_16_reflectance.xlsx')
-dataref=dataref.parse(0)
-wl=dataref.columns[1:].values
-ref=dataref.iloc[:,1:]
+savepath1=r'D:\Data\jurong\jur\Results'
+# dataref=pd.ExcelFile(r'D:\Data\jurong\jur\Results\halfhour_9_16_reflectance.xlsx')
+# dataref=dataref.parse(0)
+# wl=dataref.columns[1:].values
+# ref=dataref.iloc[:,1:]
+# #
+# datara=pd.ExcelFile(r'D:\Data\jurong\jur\Results\halfhour_9_16_radiance.xlsx')
+# datara=datara.parse(0)
+# radiance=datara.iloc[:,1:]
+# #
+# doy=dataref['DOY']
+# hour=(doy%1)*24
+# setup=VIs_calculation_func.get_vegetation_indices(wl,ref,radiance)
+# columns=['doy','hour','NDVI','EVI','MTCI','MTVI2'
+#     ,'PRI','greenNDVI','rededgeNDVI','CIgreen','CVI','SR','ref_blue',
+#     'ref_green','ref_red','ref_nir','ref_rededge','radiance_blue',
+#     'radiance_green','radiance_red','radiance_nir','radiance_rededge']
 #
-datara=pd.ExcelFile(r'D:\Data\jurong\jur\Results\halfhour_9_16_radiance.xlsx')
-datara=datara.parse(0)
-radiance=datara.iloc[:,1:]
-#
-doy=dataref['DOY']
-hour=(doy%1)*24
-setup=VIs_calculation_func.get_vegetation_indices(wl,ref,radiance)
-columns=['doy','hour','NDVI','EVI','MTCI','MTVI2'
-    ,'PRI','greenNDVI','rededgeNDVI','CIgreen','CVI','SR','ref_blue',
-    'ref_green','ref_red','ref_nir','ref_rededge','radiance_blue',
-    'radiance_green','radiance_red','radiance_nir','radiance_rededge']
-
-savedata=pd.DataFrame((np.vstack([doy,hour,setup.NDVI,setup.EVI,
-    	setup.MTCI,setup.MTVI2,setup.PRI,setup.greenNDVI,setup.rededgeNDVI,
-        setup.CIgreen,setup.CVI,setup.SR,setup.Rblue,setup.Rgreen,setup.Rred,
-        setup.Rnir,setup.Rrededge,setup.Ra_blue,setup.Ra_green,setup.Ra_red,
-        setup.Ra_nir,setup.Ra_rededge]).T),columns=columns)
-savedata.to_csv(savepath+'/VI_ref_addMTVI2_halfhourlymean_2017.csv',index=False,header=True)
+# savedata=pd.DataFrame((np.vstack([doy,hour,setup.NDVI,setup.EVI,
+#     	setup.MTCI,setup.MTVI2,setup.PRI,setup.greenNDVI,setup.rededgeNDVI,
+#         setup.CIgreen,setup.CVI,setup.SR,setup.Rblue,setup.Rgreen,setup.Rred,
+#         setup.Rnir,setup.Rrededge,setup.Ra_blue,setup.Ra_green,setup.Ra_red,
+#         setup.Ra_nir,setup.Ra_rededge]).T),columns=columns)
+# savedata.to_csv(savepath1+'/VI_ref_addMTVI2_halfhourlymean_2017.csv',index=False,header=True)
 
 # get SIF
-# filepath=r'D:\Data2018\jr2018\Results\SIF day'
-# filesifs=os.listdir(filepath)
-# for filesif in filesifs:
-# 	data=pd.ExcelFile(filepath+'/'+filesif)
-# 	data=data.parse(0)
-# 	# 只选取 3fLD，ifld和SFM_lin方法
-# 	newdata=pd.concat([data['3FLD'],data['iFLD'],data['SFM_lin']],axis=1)
-# 	mattime=data['time'].values
-# 	doy = list(map(get_matlab2py_doy, mattime))
-# 	doy = pd.DataFrame(doy, columns=['doy'])
-# 	hour=doy%1*24
-# 	idx=(hour>=9) & (hour<9+0.5)
-# 	tdata=np.hstack([int(doy.iloc[0,0]),9,np.nanmean(newdata.loc[idx['doy'],:],axis=0)]) #这里idx的‘doy’是上面doy的，因为由其生成的
-# 	for h in np.arange(9.5,16.5,0.5):
-# 		idx=(hour>=h) & (hour<h+0.5)
-# 		ttdata=np.hstack([int(doy.iloc[0,0]),h,np.nanmean(newdata.loc[idx['doy'],:],axis=0)])
-# 		tdata=np.vstack([tdata,ttdata])
-# 	tdata=pd.DataFrame(tdata,columns=['doy','hour','3FLD','iFLD','SFM'])
-# 	if filesif==filesifs[0]:
-# 		Tdata=tdata
-# 	else:
-# 		Tdata=pd.concat([Tdata,tdata],axis=0)
-# 	print(filesif +' is ok...')
-# Tdata.loc[(Tdata['3FLD']<0) | (Tdata['3FLD']>4),'3FLD']=np.nan
-# Tdata.loc[(Tdata['iFLD']<0) | (Tdata['iFLD']>4),'iFLD']=np.nan
-# Tdata.loc[(Tdata['SFM']<0) | (Tdata['SFM']>4),'SFM']=np.nan
-# Tdata.to_csv(r'D:\Data2018\jr2018\Results'+'/SIF_halfhourmean.csv',index=False,header=True)
+# sif=pd.ExcelFile(r'D:\Data\jurong\jur\Results\Jurong_2017_SIF_Half_hour.xlsx')
+# sif=sif.parse(0)
+# doy=sif['DOY']
+# time=list(map(int,doy))
+# idx=((doy-time)>8.6/24) & ((doy-time)<16.1/24)
+# newdata=pd.concat([sif.loc[idx,'DOY'],sif.loc[idx,'3FLD'],sif.loc[idx,'iFLD'],sif.loc[idx,'SFMlinear']],axis=1)
+# newdata.index=range(len(newdata))
+# newdata.to_csv(savepath1+'/Jurong_2017_SIF_Half_hour_extract.csv',index=False,header=True)
+# # # link sif&vi&radiance
+# datasif = pd.read_csv(savepath1 + '/Jurong_2017_SIF_Half_hour_extract.csv')
+# print(datasif.shape)
+# datavi = pd.read_csv(savepath1 + '/VI_ref_addMTVI2_halfhourlymean_2017.csv')
+# print(datavi.shape)
+# # 把所有冠层辐射参数提取出来
+# filecanopyra = r'D:\Thesis2\data_processed\Database REF\WalRefhalfhour_9-16_jr2017rice'
+# files = os.listdir(filecanopyra)
+# SRAD = pd.read_table(filecanopyra + '/' + files[0])
+# # print(SRAD.columns)
+# namedict = {'Rad-Down': files[0][:-4] + '_' + 'Rad-Down', 'Rad-up': files[0][
+#     :-4] + '_' + 'Rad-Up', 'Reflectance': files[0][:-4] + '_' + 'Reflectance'}
+# SRAD.rename(columns=namedict, inplace=True)
+# # print(SRAD.columns)
+# for file in files[1:]:
+#     srad=pd.read_table(filecanopyra+'/'+file)
+#     srad=srad.iloc[:,1:]
+#     namedict = {'Rad-Down': file[:-4] + '_' + 'Rad-Down', 'Rad-up': file[
+#     :-4] + '_' + 'Rad-Up', 'Reflectance': file[:-4] + '_' + 'Reflectance'}
+#     srad.rename(columns=namedict,inplace=True)
+#     SRAD=pd.concat([SRAD,srad],axis=1)
+# dataall=pd.concat([datasif,datavi.iloc[:,2:],SRAD.iloc[:,1:]],axis=1)
+# dataall.to_csv(savepath1+'\SIF_vi_ref_radiance_jurong2017.csv',index=False,header=True)
 
 ## ---------2018-------------
 # ----------------get ref & VIs & radiance-------------

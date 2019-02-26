@@ -38,10 +38,15 @@ class VI_container(object):
 	Rred=np.array([])
 	Rnir=np.array([])
 	Rrededge=np.array([])
+	Ra_blue=np.array([])
+	Ra_green=np.array([])
+	Ra_red=np.array([])
+	Ra_nir=np.array([])
+	Ra_rededge=np.array([])
 
 
 
-def get_vegetation_indices(wl, ref):
+def get_vegetation_indices(wl, ref,radiance):
 	'''
 	计算植被指数
 	'''
@@ -72,6 +77,12 @@ def get_vegetation_indices(wl, ref):
 	R_lamda_670 = np.nanmean(ref.loc[:, i_lamda_670], axis=1)
 	R_lamda_531 = np.nanmean(ref.loc[:, i_lamda_531], axis=1)
 	R_lamda_570 = np.nanmean(ref.loc[:, i_lamda_570], axis=1)
+	# get average radiance
+	Ra_blue=np.nanmean(radiance.loc[:,iblue],axis=1)
+	Ra_green=np.nanmean(radiance.loc[:,igreen],axis=1)
+	Ra_red=np.nanmean(radiance.loc[:,ired],axis=1)
+	Ra_nir=np.nanmean(radiance.loc[:,iNIR],axis=1)
+	Ra_rededge=np.nanmean(radiance.loc[:,irededge],axis=1)
     # get VIS
 	setup = VI_container()
 	setup.NDVI = (Rnir - Rred) / (Rnir + Rred)
@@ -92,6 +103,11 @@ def get_vegetation_indices(wl, ref):
 	setup.Rred=Rred
 	setup.Rnir=Rnir
 	setup.Rrededge=Rrededge
+	setup.Ra_blue=Ra_blue
+	setup.Ra_green=Ra_green
+	setup.Ra_red=Ra_red
+	setup.Ra_nir=Ra_nir
+	setup.Ra_rededge=Ra_rededge
 
 	return setup
 

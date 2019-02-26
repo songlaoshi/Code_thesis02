@@ -60,7 +60,7 @@ newdata.columns=columns
 ## correlation matrix plot
 corrs=newdata.corr()
 # plot correlation matrix
-cax=plt.matshow(corrs,vmin=0,vmax=1) 
+cax=plt.imshow(corrs,vmin=0,vmax=1) 
 plt.colorbar()
 ticks=np.arange(0,5)
 plt.xticks(ticks,["SIF","APAR","SIFesc","GPP","NIRvP"])
